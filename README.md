@@ -1,48 +1,47 @@
-# Analisis Dataset Ataraxia
+# Dataset Emosi Ataraxia
 
-Proyek klasifikasi emosi (8 kelas) dari kalimat bahasa Indonesia, disertai aplikasi Streamlit untuk memprediksi emosi dari teks.
+Pembersihan dan presentasi dataset teks bahasa Indonesia berlabel emosi (8 kelas): `senang`, `sedih`, `marah`, `takut`, `jijik`, `kaget`, `cape`, `netral`.
 
-Kelas: senang, sedih, marah, takut, kaget, jijik, cape, netral.
-
-## Struktur
+## Isi proyek
 
 ```
-proyek_emosi/
-  app.py                    Aplikasi Streamlit
-  pembersihan_data.ipynb    Pembersihan data mentah menjadi data bersih
-  analisis_emosi.ipynb      Eksplorasi, model, dan evaluasi
-  requirements.txt          Dependensi aplikasi
+proyek/
+  app.py                          aplikasi Streamlit untuk presentasi data
+  requirements.txt                dependensi (streamlit, pandas)
+  pembersihan_data_ataraxia.ipynb notebook pembersihan data mentah
   data/
-    dataset_mentah_ataraxia.csv   17.530 baris (simulasi)
-    dataset_clean_ataraxia.csv    16.000 baris
+    dataset_mentah_ataraxia.csv   data mentah (17.530 baris)
+    dataset_clean_ataraxia.csv    data bersih (16.000 baris)
 ```
 
-## Menjalankan
+## Cara menjalankan
 
 ```
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Jalankan dari folder yang berisi `data/`. `requirements.txt` hanya memuat dependensi aplikasi; untuk menjalankan notebook, pasang juga `jupyter`, `matplotlib`, dan `seaborn`. Urutan notebook yang disarankan: `pembersihan_data.ipynb`, lalu `analisis_emosi.ipynb`.
+Untuk mengulang pembersihan, buka `pembersihan_data_ataraxia.ipynb` di Jupyter dan jalankan semua sel. Hasilnya disimpan ke `dataset_clean_hasil.csv`.
 
-## Data
+## Proses pembersihan
 
-Aplikasi dan notebook analisis hanya memakai `data/dataset_clean_ataraxia.csv`: 16.000 kalimat pendek berlabel emosi, 2.000 per kelas.
+| Langkah | Keterangan |
+|---|---|
+| Penyeragaman label | huruf kecil dan buang spasi tepi, 37 variasi menjadi 8 label |
+| Buang label tidak valid | kosong, `bahagia`, `unknown`, `test`, `???`, `3` (180 baris) |
+| Buang teks kosong | 150 baris |
+| Bersihkan teks | hapus URL, mention, karakter zero-width, tab, spasi ganda, lalu lowercase |
+| Hapus duplikat | 1.200 baris |
 
-## Metode
+Total 17.530 baris menjadi 16.000 baris. Hasilnya identik dengan `dataset_clean_ataraxia.csv` (teks sama, label cocok 100%).
 
-- Normalisasi teks: huruf kecil dan spasi dirapikan.
-- Pembagian data: 80% latih dan 20% uji dengan stratifikasi label (`random_state=42`).
-- Fitur: TF-IDF kata (unigram dan bigram, `min_df=2`).
-- Model: Logistic Regression (`C=5`).
+## Kesimpulan
 
-## Hasil
-
-Akurasi dan F1 makro pada data uji: 98,3%.
-
-Kalimat pada dataset memiliki pola yang seragam, sehingga akurasi tinggi belum menjamin performa yang sama pada teks dengan gaya berbeda. Hal itu belum diuji.
-
-## Catatan
-
-`dataset_mentah_ataraxia.csv` adalah data simulasi yang dibuat dari data bersih dengan menambahkan kotoran (variasi huruf, spasi berlebih, URL, mention, duplikat, nilai kosong, dan label tidak valid). Data ini bukan data mentah hasil pengumpulan asli. Jumlah baris sebelum dan sesudah pembersihan pada `pembersihan_data.ipynb` mencerminkan simulasi tersebut.
+1. **Data mentah cukup kotor.** Sekitar 8,7% baris (1.530 dari 17.530) dibuang karena label tidak valid, teks kosong, atau duplikat. Banyak sisanya perlu dirapikan: ratusan teks berisi URL, mention, dan karakter tak terlihat, serta label dengan penulisan tidak konsisten.
+2. **Hasil akhir seimbang sempurna.** Setiap kelas berisi tepat 2.000 data, sehingga tidak perlu teknik penyeimbangan kelas saat melatih model.
+3. **Tidak ada duplikat teks dan tidak ada teks dengan label bertentangan** pada data bersih.
+4. **Teks pendek.** Rata-rata sekitar 50 karakter (median 45, minimum 10, maksimum 253), sehingga cocok untuk model klasifikasi teks pendek.
+5. **Siap dipakai untuk pemodelan**, dengan catatan berikut:
+   - Kalimat cenderung berpola mirip (misalnya diakhiri "aku senang!" atau "aku marah!"), sehingga model bisa mengandalkan kata emosi eksplisit dan kurang teruji pada kalimat yang emosinya tersirat.
+   - Beberapa label perlu dicek manual. Contohnya kalimat "kakak beli mobil baru. aku merasa dihina." berlabel `netral`.
+   - Belum ada pembagian data latih, validasi, dan uji. Lakukan pembagian bertingkat (stratified) agar proporsi kelas tetap sama.
