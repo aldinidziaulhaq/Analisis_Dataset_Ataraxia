@@ -1,193 +1,57 @@
-# Analisis Emosi pada Kutipan Marcus Aurelius
+# Analisis Dataset Ataraxia
 
-## Deskripsi Proyek
+Proyek klasifikasi emosi (8 kelas) dari kalimat bahasa Indonesia, disertai aplikasi Streamlit yang menampilkan prediksi emosi dan kutipan Marcus Aurelius dengan label yang sama.
 
-Proyek ini bertujuan untuk menganalisis emosi yang terkandung dalam kumpulan kutipan Marcus Aurelius menggunakan pendekatan Exploratory Data Analysis (EDA) dan visualisasi data interaktif dengan Streamlit.
+Kelas: senang, sedih, marah, takut, kaget, jijik, cape, netral.
 
-Analisis dilakukan untuk memahami distribusi emosi, karakteristik panjang teks, serta kata-kata yang dominan pada setiap kategori emosi.
+## Struktur
 
----
-
-## Business Understanding
-
-### Latar Belakang
-
-Marcus Aurelius dikenal sebagai filsuf Stoik yang meninggalkan banyak kutipan mengenai kehidupan, pengendalian diri, kebijaksanaan, dan ketenangan batin. Dengan melakukan analisis terhadap kumpulan kutipan tersebut, kita dapat memperoleh pemahaman mengenai pola emosi yang muncul dalam teks.
-
-### Pertanyaan Bisnis
-
-1. Apakah jumlah data pada setiap kategori emosi sudah merata?
-2. Apakah panjang teks berbeda pada setiap kategori emosi?
-3. Kata apa yang paling sering muncul pada setiap kategori emosi?
-
----
-
-## Dataset
-
-Dataset terdiri dari dua kolom utama:
-
-| Kolom | Deskripsi                   |
-| ----- | --------------------------- |
-| label | Kategori emosi              |
-| text  | Isi kutipan Marcus Aurelius |
-
-### Data Dictionary
-
-| Kolom       | Tipe Data | Deskripsi                    |
-| ----------- | --------- | ---------------------------- |
-| label       | object    | Label emosi                  |
-| text        | object    | Isi kutipan                  |
-| word_count  | integer   | Jumlah kata pada kutipan     |
-| char_length | integer   | Jumlah karakter pada kutipan |
-
----
-
-## Tahapan Analisis
-
-### 1. Data Understanding
-
-* Memuat dataset
-* Memeriksa struktur data
-* Memeriksa missing values
-* Membuat data dictionary
-
-### 2. Data Preparation
-
-* Membersihkan nama kolom
-* Menghapus data kosong
-* Membuat fitur:
-
-  * word_count
-  * char_length
-
-### 3. Exploratory Data Analysis (EDA)
-
-Analisis dilakukan untuk menjawab seluruh pertanyaan bisnis.
-
-#### Distribusi Emosi
-
-Menampilkan jumlah data pada setiap kategori emosi.
-
-#### Analisis Panjang Teks
-
-Menggunakan:
-
-* Word Count
-* Character Length
-
-untuk membandingkan panjang teks antar emosi.
-
-#### Analisis Kata Dominan
-
-Menggunakan:
-
-* Top 10 Kata Terbanyak
-* Word Cloud
-
-untuk mengetahui kata yang sering muncul pada setiap emosi.
-
----
-
-## Dashboard Streamlit
-
-Dashboard interaktif dikembangkan menggunakan Streamlit dengan beberapa halaman:
-
-### Overview
-
-* Jumlah data
-* Jumlah kategori emosi
-* Preview dataset
-* Data dictionary
-
-### Distribusi Emosi
-
-Menampilkan persebaran jumlah data pada setiap kategori emosi.
-
-### Analisis Panjang Teks
-
-Menampilkan boxplot:
-
-* Word Count
-* Character Length
-
-### Kata Dominan
-
-Menampilkan:
-
-* Word Cloud
-* Top Kata Terbanyak
-
-### Kesimpulan
-
-Menampilkan insight utama hasil analisis.
-
----
-
-## Tools dan Library
-
-* Python
-* Pandas
-* Matplotlib
-* Seaborn
-* WordCloud
-* Streamlit
-
----
-
-## Instalasi
-
-Clone repository:
-
-```bash
-git clone <repository-url>
-cd <repository-name>
+```
+proyek_emosi/
+  app.py                    Aplikasi Streamlit
+  pembersihan_data.ipynb    Pembersihan data mentah menjadi data bersih
+  analisis_emosi.ipynb      Eksplorasi, model, dan evaluasi
+  requirements.txt          Daftar dependensi
+  data/
+    dataset_mentah_ataraxia.csv         17.530 baris (simulasi)
+    dataset_clean_ataraxia.csv          16.000 baris
+    dataset_markus_erelius_clean.csv    1.598 baris
 ```
 
-Install dependencies:
+## Menjalankan
 
-```bash
+```
 pip install -r requirements.txt
+streamlit run app.py
 ```
 
----
+Jalankan dari folder yang berisi `data/`. Notebook dibuka dengan `jupyter notebook`, urutan yang disarankan: `pembersihan_data.ipynb`, lalu `analisis_emosi.ipynb`.
 
-## Menjalankan Dashboard
+## Data
 
-```bash
-streamlit run dashboard.py
-```
+| Berkas | Isi | Peran |
+|---|---|---|
+| `dataset_clean_ataraxia.csv` | Kalimat pendek berlabel emosi, 2.000 per kelas | Data latih dan uji |
+| `dataset_markus_erelius_clean.csv` | Kutipan Marcus Aurelius berlabel emosi | Sumber rekomendasi kutipan |
+| `dataset_mentah_ataraxia.csv` | Versi kotor dari data Ataraxia | Demonstrasi pembersihan |
 
----
+Berkas Marcus Aurelius pada sebagian versi tidak berformat CSV standar (baris dibungkus tanda kutip dan diakhiri titik koma). Pembacaan dilakukan baris demi baris di `app.py` dan notebook sehingga kedua versi terbaca.
 
-## Struktur Proyek
+## Metode
 
-```text
-project/
-│
-├── dashboard.py
-├── requirements.txt
-├── dataset_markus_erelius_clean.csv
-├── EDA_Emosi_Marcus_Aurelius.ipynb
-├── README.md
-│
-└── assets/
-```
+- Pembagian data: 80% latih dan 20% uji dengan stratifikasi label.
+- Fitur: TF-IDF kata (unigram dan bigram).
+- Model: Logistic Regression.
 
----
+## Hasil
 
-## Hasil Analisis
+| Pengujian | Akurasi |
+|---|---|
+| Data uji Ataraxia | 98,3% |
+| Kutipan Marcus Aurelius | 25,3% (acak untuk 8 kelas: 12,5%) |
 
-Berdasarkan analisis yang dilakukan:
+Akurasi tinggi pada data uji mencerminkan pola kalimat yang seragam pada dataset Ataraxia. Model tidak generalisasi ke kutipan Marcus Aurelius yang gayanya berbeda, sehingga dataset tersebut hanya dipakai sebagai sumber kutipan, bukan untuk evaluasi.
 
-* Distribusi emosi dapat digunakan untuk melihat keseimbangan dataset.
-* Panjang teks berbeda pada beberapa kategori emosi.
-* Kata-kata tertentu muncul lebih dominan pada emosi tertentu.
-* Dashboard Streamlit mempermudah eksplorasi dan interpretasi data secara interaktif.
+## Catatan
 
----
-
-## Author
-
-Capstone Project – Data Analyst
-
-Analisis Emosi pada Kutipan Marcus Aurelius menggunakan Python, EDA, dan Streamlit.
+`dataset_mentah_ataraxia.csv` adalah data simulasi yang dibuat dari data bersih dengan menambahkan kotoran (variasi huruf, spasi berlebih, URL, mention, duplikat, nilai kosong, dan label tidak valid). Data ini bukan data mentah hasil pengumpulan asli. Jumlah baris sebelum dan sesudah pembersihan pada notebook mencerminkan simulasi tersebut.
